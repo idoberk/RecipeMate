@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "735664922235",
+    "project_id": "recipemate-86693",
+    "storage_bucket": "recipemate-86693.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:735664922235:android:01151dd978b9255a3a0cde",
+        "android_client_info": {
+          "package_name": "com.example.recipemate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9C_ZNhNfqxQ5vOw2F8YaBkEX7x3mAABU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

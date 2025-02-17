@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/homepage_background">
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:gravity="center_horizontal|center_vertical"
+		android:orientation="vertical">
+
+		<TextView
+			android:id="@+id/welcomeTextView"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:fontFamily="@font/akaya_telivigala"
+			android:gravity="center"
+			android:text="Welcome"
+			android:textAlignment="center"
+			android:textColor="#FFFFFF"
+			android:textSize="48sp"
+			android:textStyle="bold|italic" />
+
+		<LinearLayout
+			android:layout_width="270dp"
+			android:layout_height="wrap_content"
+			android:layout_weight="0"
+			android:gravity="center_horizontal|center_vertical"
+			android:orientation="horizontal">
+
+			<Button
+				android:id="@+id/buttonHomePageLogin"
+				android:layout_width="130dp"
+				android:layout_height="wrap_content"
+				android:layout_marginEnd="5dp"
+				android:background="@drawable/buttons"
+				android:includeFontPadding="false"
+				android:fontFamily="@font/akaya_telivigala"
+				android:textAllCaps="false"
+				android:text="Login"
+				android:textAlignment="center"
+				android:textColor="#FAFAFA"
+				android:textSize="24sp" />
+
+			<Button
+				android:id="@+id/buttonHomePageRegister"
+				android:layout_width="130dp"
+				android:layout_height="wrap_content"
+				android:layout_marginStart="5dp"
+				android:background="@drawable/buttons"
+				android:fontFamily="@font/akaya_telivigala"
+				android:textAllCaps="false"
+				android:includeFontPadding="false"
+				android:text="Register"
+				android:textAlignment="center"
+				android:textColor="#FAFAFA"
+				android:textSize="24sp" />
+		</LinearLayout>
+
+	</LinearLayout>
+</LinearLayout>
