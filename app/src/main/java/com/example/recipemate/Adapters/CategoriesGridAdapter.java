@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.recipemate.Listeners.CategoryClickListener;
 import com.example.recipemate.Modals.RecipesCategories;
 import com.example.recipemate.R;
 import com.squareup.picasso.Picasso;
@@ -18,8 +19,9 @@ import com.squareup.picasso.Picasso;
 import java.util.List;
 
 public class CategoriesGridAdapter extends RecyclerView.Adapter<CategoriesGridAdapter.ViewHolder> {
-	private List<RecipesCategories> categoriesList;
 	private Context context;
+	private List<RecipesCategories> categoriesList;
+	private CategoryClickListener listener;
 
 	static class ViewHolder extends RecyclerView.ViewHolder {
 		CardView cardView;
@@ -34,9 +36,10 @@ public class CategoriesGridAdapter extends RecyclerView.Adapter<CategoriesGridAd
 		}
 	}
 
-	public CategoriesGridAdapter(Context context, List<RecipesCategories> categoriesList) {
+	public CategoriesGridAdapter(Context context, List<RecipesCategories> categoriesList, CategoryClickListener listener) {
 		this.context = context;
 		this.categoriesList = categoriesList;
+		this.listener = listener;
 	}
 
 	@NonNull
@@ -52,10 +55,12 @@ public class CategoriesGridAdapter extends RecyclerView.Adapter<CategoriesGridAd
 		holder.categoryName.setText(category.getCategoryName());
 		Picasso.get().load(category.getCategoryImage()).into(holder.categoryImage);
 
-//		holder.cardView.setOnClickListener(view -> {
-//
-//		});
-
+		holder.cardView.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View view) {
+               listener.onCategoryClick(category.getCategoryName());
+           }
+		});
 	}
 
 	@Override

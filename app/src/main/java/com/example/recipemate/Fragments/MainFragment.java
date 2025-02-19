@@ -3,6 +3,7 @@ package com.example.recipemate.Fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.recipemate.Adapters.CategoriesGridAdapter;
+import com.example.recipemate.Listeners.CategoryClickListener;
 import com.example.recipemate.Modals.CategoriesRecyclerViewGrid;
 import com.example.recipemate.R;
 
@@ -19,7 +21,7 @@ import com.example.recipemate.R;
  * Use the {@link MainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements CategoryClickListener {
 
 	// TODO: Rename parameter arguments, choose names that match
 	// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -73,6 +75,13 @@ public class MainFragment extends Fragment {
 
 		categoriesGrid = new CategoriesRecyclerViewGrid();
 		categoriesRecyclerView = view.findViewById(R.id.categoriesRecyclerView);
+//		categoriesRecyclerView.setOnClickListener(new View.OnClickListener() {
+//			@Override
+//			public void onClick(View view) {
+//				Navigation.findNavController(view).navigate(R.id.action_mainFragment_to_recipeListFragment);
+//			}
+//		});
+
 		setRecyclerView();
 
 		return view;
@@ -82,7 +91,15 @@ public class MainFragment extends Fragment {
 		GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), categoriesGrid.getColumnCount());
 		categoriesRecyclerView.setLayoutManager(gridLayoutManager);
 
-		categoriesAdapter = new CategoriesGridAdapter(requireContext(), categoriesGrid.getCategoriesList());
+		categoriesAdapter = new CategoriesGridAdapter(requireContext(), categoriesGrid.getCategoriesList(), this);
 		categoriesRecyclerView.setAdapter(categoriesAdapter);
+	}
+
+	@Override
+	public void onCategoryClick(String categoryName) {
+		Bundle bundle = new Bundle();
+		bundle.putString("category", categoryName.toLowerCase());
+
+		Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_recipeListFragment, bundle);
 	}
 }

@@ -47,5 +47,14 @@
 		android:id="@+id/mainFragment"
 		android:name="com.example.recipemate.Fragments.MainFragment"
 		android:label="fragment_main"
-		tools:layout="@layout/fragment_main" />
+		tools:layout="@layout/fragment_main" >
+		<action
+			android:id="@+id/action_mainFragment_to_recipeListFragment"
+			app:destination="@id/recipeListFragment" />
+	</fragment>
+	<fragment
+		android:id="@+id/recipeListFragment"
+		android:name="com.example.recipemate.Fragments.RecipeListFragment"
+		android:label="fragment_recipe_list"
+		tools:layout="@layout/fragment_recipe_list" />
 </navigation>
