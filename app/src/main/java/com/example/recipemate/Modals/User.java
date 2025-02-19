@@ -1,4 +1,4 @@
-package com.example.recipemate.Models;
+package com.example.recipemate.Modals;
 
 import java.util.ArrayList;
 

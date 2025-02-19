@@ -2,6 +2,7 @@ package com.example.recipemate.Activities;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.navigation.Navigation;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -47,10 +49,12 @@ public class MainActivity extends AppCompatActivity {
 					public void onComplete(@NonNull Task<AuthResult> task) {
 						if (task.isSuccessful()) {
 							FirebaseUser user = mAuth.getCurrentUser();
+							View navHostFragment = findViewById(R.id.fragmentContainerView);
 							if (user != null) {
 								Log.d("Login", "User logged in successfully: " + user.getEmail());
 								Toast.makeText(MainActivity.this, "Login successful!",
 										Toast.LENGTH_SHORT).show();
+								Navigation.findNavController(navHostFragment).navigate(R.id.action_loginFragment_to_mainFragment);
 							}
 						} else {
 							Log.e("Login", "Login failed", task.getException());
