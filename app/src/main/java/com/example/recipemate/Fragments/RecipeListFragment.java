@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,7 @@ public class RecipeListFragment extends Fragment {
 	RequestManager requestManager;
 	RandomRecipeAdapter randomRecipeAdapter;
 	RecyclerView recyclerView;
+	String category;
 
 	/**
 	 * Use this factory method to create a new instance of
@@ -66,8 +68,7 @@ public class RecipeListFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (getArguments() != null) {
-			mParam1 = getArguments().getString(ARG_PARAM1);
-			mParam2 = getArguments().getString(ARG_PARAM2);
+			category = getArguments().getString("category", "");
 		}
 
 //        requestManager = new RequestManager(mainActivity);
@@ -75,18 +76,18 @@ public class RecipeListFragment extends Fragment {
 
 	}
 
-	private final RandomRecipeResponseListener randomRecipeResponseListener = new RandomRecipeResponseListener() {
-		@Override
-		public void didFetch(RandomRecipeApiResponse response, String message) {
-            randomRecipeAdapter = new RandomRecipeAdapter(requireContext(), response.recipes);
-			recyclerView.setAdapter(randomRecipeAdapter);
-		}
-
-		@Override
-		public void didError(String message) {
-			Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-		}
-	};
+//	private final RandomRecipeResponseListener randomRecipeResponseListener = new RandomRecipeResponseListener() {
+//		@Override
+//		public void didFetch(RandomRecipeApiResponse response, String message) {
+//            randomRecipeAdapter = new RandomRecipeAdapter(requireContext(), response.recipes);
+//			recyclerView.setAdapter(randomRecipeAdapter);
+//		}
+//
+//		@Override
+//		public void didError(String message) {
+//			Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+//		}
+//	};
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,8 +98,33 @@ public class RecipeListFragment extends Fragment {
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
+		// requestManager.getRandomRecipes(category, randomRecipeResponseListener);
+
+		if (getArguments() != null) {
+			category = getArguments().getString("category", "");
+			Log.d("Category", "Received category: " + category);
+		}
+
 		requestManager = new RequestManager(requireContext());
+		fetchRecipes();
 
 		return view;
+	}
+
+	private void fetchRecipes() {
+		Log.d("Category", "Fetching recipes for category: " + category);
+		requestManager.getRandomRecipes(category, new RandomRecipeResponseListener() {
+			@Override
+			public void didFetch(RandomRecipeApiResponse response, String message) {
+				Log.d("Category", "Fetched recipes for category: " + category);
+				randomRecipeAdapter = new RandomRecipeAdapter(requireContext(), response.recipes);
+				recyclerView.setAdapter(randomRecipeAdapter);
+			}
+
+			@Override
+			public void didError(String message) {
+				Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 }

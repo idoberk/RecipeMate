@@ -26,7 +26,11 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_marginBottom="5dp"
-				android:textSize="24sp"
+				android:singleLine="true"
+				android:scrollHorizontally="true"
+				android:ellipsize="marquee"
+				android:marqueeRepeatLimit="marquee_forever"
+				android:textSize="20sp"
 				android:textStyle="bold" />
 
 			<LinearLayout
@@ -75,7 +79,7 @@
 		</LinearLayout>
 
 		<FrameLayout
-			android:layout_width="80dp"
+			android:layout_width="120dp"
 			android:layout_height="wrap_content">
 
 			<ImageView
@@ -87,9 +91,12 @@
 
 			<ImageButton
 				android:id="@+id/FavoriteButton"
-				android:layout_width="24dp"
-				android:layout_height="24dp"
+				android:layout_width="32dp"
+				android:layout_height="32dp"
 				android:layout_gravity="top|end"
+				android:layout_margin="6dp"
+				android:background="@null"
+				android:scaleType="fitCenter"
 				app:srcCompat="@drawable/ic_favorites" />
 		</FrameLayout>
 
