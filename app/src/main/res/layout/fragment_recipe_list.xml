@@ -6,6 +6,29 @@
               android:orientation="vertical"
               tools:context=".Fragments.RecipeListFragment" >
 
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal" >
+
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dp"
+			android:text="Results for: "
+			android:textSize="24sp"
+			android:textStyle="bold" />
+
+		<TextView
+			android:id="@+id/CategoryText"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_margin="10dp"
+			android:text="Fish"
+			android:textSize="24sp"
+			android:textStyle="bold" />
+
+	</LinearLayout>
 	<androidx.recyclerview.widget.RecyclerView
 		android:id="@+id/RecipeListRV"
 		android:layout_width="match_parent"

@@ -1,6 +1,8 @@
 <resources>
 	<string name="app_name">RecipeMate</string>
-	<string name="api_key">795c5e57d8da4c13bb02e89f6cc6a60c</string>
+	<string name="api_key">c82685868bf34be99019d9760cdc22ac</string>
 	<!-- TODO: Remove or change this placeholder text -->
 	<string name="hello_blank_fragment">Hello blank fragment</string>
+	<!--	<string name="api_key">795c5e57d8da4c13bb02e89f6cc6a60c</string>-->
+
 </resources>

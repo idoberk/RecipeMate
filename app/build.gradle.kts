@@ -47,4 +47,5 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.picasso)
+    implementation(libs.commons.lang3)
 }

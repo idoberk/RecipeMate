@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              tools:context=".Fragments.RecipeDetailsFragment" >
+
+	<ScrollView
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:padding="8dp">
+
+			<FrameLayout
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
+
+				<ImageView
+					android:id="@+id/DishImage"
+					android:layout_width="match_parent"
+					android:layout_height="match_parent"
+					tools:srcCompat="@tools:sample/avatars" />
+
+				<ImageButton
+					android:id="@+id/RecipeDetailsFavoriteButton"
+					android:layout_width="60dp"
+					android:layout_height="60dp"
+					android:layout_gravity="top|end"
+					android:layout_margin="12dp"
+					android:background="?android:selectableItemBackgroundBorderless"
+					android:clickable="true"
+					android:focusable="true"
+					android:scaleType="fitCenter"
+					android:src="@drawable/favorite_selector" />
+			</FrameLayout>
+
+			<TextView
+				android:id="@+id/DishDetailsTitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Title"
+				android:textSize="24sp"
+				android:textStyle="bold" />
+
+			<TextView
+			    android:id="@+id/IngredientsTitle"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Ingredients"
+				android:textSize="20sp"
+				android:textStyle="bold" />
+
+			<androidx.recyclerview.widget.RecyclerView
+				android:id="@+id/IngredientsRecView"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content" />
+
+		</LinearLayout>
+	</ScrollView>
+</LinearLayout>
