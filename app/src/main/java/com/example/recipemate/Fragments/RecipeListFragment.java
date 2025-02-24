@@ -3,7 +3,7 @@ package com.example.recipemate.Fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.recipemate.Activities.MainActivity;
 import com.example.recipemate.Adapters.RandomRecipeAdapter;
 import com.example.recipemate.Listeners.RandomRecipeResponseListener;
 import com.example.recipemate.Listeners.RecipeClickListener;
@@ -30,11 +29,10 @@ public class RecipeListFragment extends Fragment {
 		// Required empty public constructor
 	}
 
-//	MainActivity mainActivity;
 	private RequestManager requestManager;
 	private RandomRecipeAdapter randomRecipeAdapter;
 	private RecyclerView recyclerView;
-	private TextView categoryTitle;
+	private TextView categoryTitle, resultText;
 	private String category;
 
 	@Override
@@ -54,8 +52,9 @@ public class RecipeListFragment extends Fragment {
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 		categoryTitle = view.findViewById(R.id.CategoryText);
+		resultText = view.findViewById(R.id.ResultsText);
+		resultText.setVisibility(View.VISIBLE);
 		categoryTitle.setText(StringUtils.capitalize(category));
-		// requestManager.getRandomRecipes(category, randomRecipeResponseListener);
 
 		if (getArguments() != null) {
 			category = getArguments().getString("category", "");
@@ -74,7 +73,7 @@ public class RecipeListFragment extends Fragment {
 			@Override
 			public void didFetch(RandomRecipeApiResponse response, String message) {
 				Log.d("Category", "Fetched recipes for category: " + category);
-				randomRecipeAdapter = new RandomRecipeAdapter(requireContext(), response.recipes, recipeClickListener);
+				randomRecipeAdapter = new RandomRecipeAdapter(requireContext(), response.recipes, recipeClickListener, 2);
 				recyclerView.setAdapter(randomRecipeAdapter);
 			}
 
@@ -88,7 +87,11 @@ public class RecipeListFragment extends Fragment {
 	private final RecipeClickListener recipeClickListener = new RecipeClickListener() {
 		@Override
 		public void onRecipeClick(String recipeId) {
-			Toast.makeText(getContext(), "Recipe clicked: " + recipeId, Toast.LENGTH_SHORT).show();
+			Bundle bundle = new Bundle();
+			bundle.putInt("recipeId", Integer.parseInt(recipeId));
+			Navigation.findNavController(requireView()).navigate(R.id.action_recipeListFragment_to_recipeDetailsFragment, bundle);
+			Log.d("RecipeListFragment RecipeClickListener", "Recipe clicked: " + recipeId);
+			Toast.makeText(getContext(), "Recipe clicked: " + recipeId, Toast.LENGTH_LONG).show();
 		}
 	};
 }

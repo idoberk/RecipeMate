@@ -33,7 +33,11 @@
 			android:id="@+id/favoritesFragment" 
 			android:name="com.example.recipemate.Fragments.FavoritesFragment"
 			android:label="fragment_favorites"
-			tools:layout="@layout/fragment_favorites" />
+			tools:layout="@layout/fragment_favorites" >
+			<action
+				android:id="@+id/action_favoritesFragment_to_recipeDetailsFragment"
+				app:destination="@id/recipeDetailsFragment" />
+		</fragment>
 
 		<fragment
 			android:id="@+id/recipeDetailsFragment"
@@ -41,7 +45,7 @@
 			android:label="fragment_recipe_details"
 			tools:layout="@layout/fragment_recipe_details" >
 			<argument
-				android:name="recipe_id"
+				android:name="recipeId"
 				app:argType="integer" />
 
 		</fragment>

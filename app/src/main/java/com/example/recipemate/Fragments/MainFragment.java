@@ -50,7 +50,6 @@ public class MainFragment extends Fragment implements CategoryClickListener {// 
 	private RequestManager requestManager;
 	private Handler searchHandler = new Handler(Looper.getMainLooper());
 	private Runnable searchRunnable;
-	// private DrawerLayout drawerLayout;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -155,14 +154,18 @@ public class MainFragment extends Fragment implements CategoryClickListener {// 
 
 		categoriesRecyclerView.setVisibility(View.GONE);
 		searchedRecipesRecyclerView.setVisibility(View.VISIBLE);
-		searchedRecipesRecyclerView.setAdapter(new RandomRecipeAdapter(requireContext(), recipes, recipeClickListener));
+		searchedRecipesRecyclerView.setAdapter(new RandomRecipeAdapter(requireContext(), recipes, recipeClickListener, 1));
 		Log.d("Search", "Showing recipes for query");
 	}
 
 	private final RecipeClickListener recipeClickListener = new RecipeClickListener() {
 		@Override
 		public void onRecipeClick(String recipeId) {
-			Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_recipeDetailsFragment);
+			Bundle bundle = new Bundle();
+			bundle.putInt("recipeId", Integer.parseInt(recipeId));
+			Navigation.findNavController(requireView()).navigate(R.id.action_mainFragment_to_recipeDetailsFragment, bundle);
+			Log.d("MainFragment RecipeClickListener", "Recipe clicked: " + recipeId);
+			Toast.makeText(getContext(), "Recipe clicked: " + recipeId, Toast.LENGTH_LONG).show();
 		}
 	};
 }

@@ -16,6 +16,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.recipemate.Modals.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
@@ -27,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -91,9 +93,10 @@ public class MainActivity extends AppCompatActivity {
 					@Override
 					public void onComplete(@NonNull Task<AuthResult> task) {
 						if (task.isSuccessful()) {
-							FirebaseUser user = mAuth.getCurrentUser();
-							if (user != null) {
-								// addData(user);
+							FirebaseUser firebaseUser = mAuth.getCurrentUser();
+							if (firebaseUser != null) {
+								User user = new User(firebaseUser.getUid(), email);
+								addData(user);
 								Toast.makeText(MainActivity.this, "register ok", Toast.LENGTH_LONG).show();
 							}
 						} else {
@@ -115,7 +118,17 @@ public class MainActivity extends AppCompatActivity {
 				});
 	}
 
-	public void addData(FirebaseUser user) {
-
+	public void addData(User user) {
+		FirebaseFirestore db = FirebaseFirestore.getInstance();
+		db.collection("users").
+				document(user.getUserid())
+				.set(user)
+				.addOnSuccessListener(aVoid -> {
+					Log.d("Register", "User added to database");
+					Toast.makeText(MainActivity.this, "User added to database", Toast.LENGTH_LONG).show();
+				}).addOnFailureListener(e -> {
+					Log.e("Register", "Failed to add user to database", e);
+					Toast.makeText(MainActivity.this, "Failed to add user to database", Toast.LENGTH_LONG).show();
+				});
 	}
 }

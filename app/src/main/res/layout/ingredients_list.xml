@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                   android:layout_width="match_parent"
+                                   android:layout_height="wrap_content"
+                                   app:cardElevation="4dp"
+	android:background="@android:color/transparent">
 
 	<LinearLayout
 		android:layout_width="match_parent"
@@ -13,20 +14,24 @@
 
 		<TextView
 			android:id="@+id/IngredientNameText"
-			android:layout_width="wrap_content"
+			android:layout_width="match_parent"
 			android:layout_height="wrap_content"
-			android:layout_margin="6dp"
+			android:singleLine="true"
+			android:ellipsize="marquee"
+			android:marqueeRepeatLimit="marquee_forever"
+			android:scrollHorizontally="true"
+			android:layout_marginStart="4dp"
 			android:layout_weight="1"
 			android:text="IngredientName"
-			android:textSize="14sp"
+			android:textSize="16sp"
 			android:textStyle="bold|italic" />
 
 		<TextView
-			android:id="@+id/IngredientAmountText"
+			android:id="@+id/IngredientQuantityText"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
-			android:layout_margin="6dp"
 			android:layout_weight="1"
+			android:layout_marginStart="4dp"
 			android:text="IngredientAmount"
 			android:textSize="12sp" />
 
@@ -34,6 +39,7 @@
 			android:id="@+id/view"
 			android:layout_width="match_parent"
 			android:layout_height="1dp"
+			android:layout_marginTop="1dp"
 			android:background="#000000" />
 	</LinearLayout>
-</LinearLayout>
+</androidx.cardview.widget.CardView>
