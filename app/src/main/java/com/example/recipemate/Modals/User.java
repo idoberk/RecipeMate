@@ -58,6 +58,20 @@ public class User {
 	}
 
 	public boolean isFavoriteRecipe(Recipe recipe) {
-		return favorite_recipes.stream().anyMatch(favRecipe -> favRecipe.id == recipe.id);
+//		if (recipe == null) {
+//			return false;
+//		}
+
+		String recipeIdStr = Integer.toString(recipe.id);
+		 //String.valueOf(recipe.id);
+
+		for (Recipe favRecipe : favorite_recipes) {
+			String favRecipeIdStr = String.valueOf(favRecipe.id);
+			if (favRecipeIdStr.equals(recipeIdStr)) {
+				return true;
+			}
+		}
+		return false;
+//		return favorite_recipes.stream().anyMatch(favRecipe -> favRecipe.id == recipe.id;
 	}
 }

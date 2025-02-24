@@ -50,4 +50,15 @@
 
 		</fragment>
 
+	<fragment
+		android:id="@+id/myRecipesFragment"
+		android:name="com.example.recipemate.Fragments.MyRecipesFragment"
+		android:label="fragment_my_recipes"
+		tools:layout="@layout/fragment_my_recipes" >
+
+		<action
+			android:id="@+id/action_myRecipesFragment_to_recipeDetailsFragment"
+			app:destination="@id/recipeDetailsFragment" />
+	</fragment>
+
 </navigation>

@@ -89,7 +89,6 @@ public class RequestManager {
 				listener.didError(t.getMessage());
 			}
 		});
-
 	}
 
 	private interface CallRecipeApi {

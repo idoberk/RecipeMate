@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Recipe {
 	public int id;
+	public String userId;
 	public String image;
 	public String imageType;
 	public String title;

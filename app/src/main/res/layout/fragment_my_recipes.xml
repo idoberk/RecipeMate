@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".Fragments.MyRecipesFragment">
+
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent">
+
+		<androidx.recyclerview.widget.RecyclerView
+			android:id="@+id/recipesRecyclerView"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent" />
+
+		<LinearLayout
+			android:id="@+id/emptyStateView"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:gravity="center"
+			android:orientation="vertical"
+			android:visibility="gone">
+
+			<ImageView
+				android:layout_width="120dp"
+				android:layout_height="wrap_content"
+				android:scaleType="centerCrop" />
+
+			<TextView
+				android:id="@+id/emptyStateText"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_margin="16dp"
+				android:text="You haven't added any recipes yet.\nTap the + button to add your first recipe!"
+				android:textAlignment="center"
+				android:textSize="16sp" />
+
+		</LinearLayout>
+
+		<ScrollView
+			android:id="@+id/addRecipeFormContainer"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:visibility="gone">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:orientation="vertical"
+				android:padding="16dp">
+
+				<TextView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="16dp"
+					android:text="Add New Recipe"
+					android:textAlignment="center"
+					android:textSize="24sp"
+					android:textStyle="bold" />
+
+				<ImageView
+					android:id="@+id/recipeImageView"
+					android:layout_width="match_parent"
+					android:layout_height="200dp"
+					android:layout_marginBottom="10dp"
+					android:clickable="true"
+					android:focusable="true"
+					android:scaleType="centerCrop"
+					android:src="@drawable/ic_image_placeholder" />
+
+				<EditText
+					android:id="@+id/recipeTitleEditText"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="10dp"
+					android:ems="10"
+					android:hint="Recipe Title"
+					android:inputType="text"
+					android:textSize="14sp" />
+
+				<EditText
+					android:id="@+id/recipeInstructionsEditText"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="10dp"
+					android:ems="10"
+					android:hint="Recipe Instructions"
+					android:inputType="text"
+					android:textSize="14sp" />
+
+				<EditText
+					android:id="@+id/servingEditText"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="10dp"
+					android:ems="10"
+					android:hint="Serving Amount"
+					android:inputType="number"
+					android:textSize="14sp" />
+
+				<EditText
+					android:id="@+id/cookingTimeEditText"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:ems="10"
+					android:hint="Cooking Time"
+					android:inputType="number"
+					android:textSize="14sp" />
+
+				<Button
+					android:id="@+id/uploadRecipeButton"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:text="Add Recipe" />
+
+			</LinearLayout>
+
+		</ScrollView>
+
+		<com.google.android.material.floatingactionbutton.FloatingActionButton
+			android:id="@+id/addRecipeButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_gravity="bottom|end"
+			android:layout_margin="16dp"
+			app:fabSize="normal"
+			tools:src="@drawable/ic_plus" />
+
+	</FrameLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

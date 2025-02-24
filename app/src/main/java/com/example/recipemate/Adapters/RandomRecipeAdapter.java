@@ -62,7 +62,10 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
 
         holder.textView_Title.setText(recipe.title);
         holder.textView_Title.setSelected(true);
-        Picasso.get().load(recipeList.get(position).image).into(holder.imageView_RecipeImage);
+        Picasso.get().load(recipeList.get(position).image)
+                .resize(600, 400)
+                .centerCrop()
+                .into(holder.imageView_RecipeImage);
 
         holder.random_list_container.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,8 +136,8 @@ class RandomRecipeViewHolder extends RecyclerView.ViewHolder{
 
         random_list_container = itemView.findViewById(R.id.RecipeCard);
         textView_Title = itemView.findViewById(R.id.DishTitle);
-        textView_Servings = itemView.findViewById(R.id.CookingTimeText);
-        textView_Time = itemView.findViewById(R.id.ServingsAmountText);
+        textView_Servings = itemView.findViewById(R.id.ServingsAmountText);
+        textView_Time = itemView.findViewById(R.id.CookingTimeText);
         imageView_RecipeImage = itemView.findViewById(R.id.RecipeImage);
         favoriteButton = itemView.findViewById(R.id.FavoriteButton);
         imageView_CookingTimeImage =  itemView.findViewById(R.id.CookingTime);

@@ -18,7 +18,9 @@ import android.widget.Toast;
 
 import com.example.recipemate.Adapters.IngredientsAdapter;
 import com.example.recipemate.Listeners.RecipeDetailsListener;
+import com.example.recipemate.Listeners.UserRecipeDetailsCallback;
 import com.example.recipemate.Managers.FavoriteManager;
+import com.example.recipemate.Managers.UserRecipeManager;
 import com.example.recipemate.Modals.Recipe;
 import com.example.recipemate.Modals.RecipeDetailsResponse;
 import com.example.recipemate.R;
@@ -36,6 +38,7 @@ public class RecipeDetailsFragment extends Fragment {
 	private ImageButton favoriteButton;
 	private RequestManager requestManager;
 	private FavoriteManager favoriteManager;
+	private UserRecipeManager recipeManager;
 	private IngredientsAdapter ingredientAdapter;
 	private Recipe recipe;
 
@@ -78,6 +81,7 @@ public class RecipeDetailsFragment extends Fragment {
 		textViewInstructionsText = view.findViewById(R.id.InstructionsText);
 		requestManager = new RequestManager(requireContext());
 		favoriteManager = new FavoriteManager();
+		recipeManager = new UserRecipeManager();
 
 //		favoriteButton.setOnClickListener(new View.OnClickListener() {
 //			@Override
@@ -90,26 +94,69 @@ public class RecipeDetailsFragment extends Fragment {
 
 	private void loadRecipeDetails(int recipeId) {
 		Log.d("RecipeDetailsFragment", "loadRecipeDetails: " + recipeId);
-		requestManager.getRecipeDetails(new RecipeDetailsListener() {
+
+		if (recipeId < 8000000) {
+			requestManager.getRecipeDetails(new RecipeDetailsListener() {
+				@Override
+				public void didFetch(RecipeDetailsResponse response, String message) {
+					loadApiRecipeDetails(response);
+				}
+
+				@Override
+				public void didError(String message) {
+					Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+				}
+			}, recipeId);
+		} else {
+            loadUserRecipeDetails(recipeId);
+		}
+	}
+
+	private void loadApiRecipeDetails(RecipeDetailsResponse response) {
+		textView_DishDetailsTitle.setText(response.title);
+		if (response.instructions.isEmpty()) {
+			textViewInstructionsText.setText("No instructions available");
+		} else {
+			textViewInstructionsText.setText(cleanHTMLTags(response.instructions));
+		}
+		Picasso.get().load(response.image).into(imageView_DishImage);
+		recyclerViewIngredientsRecView.setHasFixedSize(true);
+		recyclerViewIngredientsRecView.setLayoutManager(new LinearLayoutManager(requireContext()));
+		ingredientAdapter = new IngredientsAdapter(requireContext(), response.extendedIngredients);
+		recyclerViewIngredientsRecView.setAdapter(ingredientAdapter);
+
+		recipe = new Recipe();
+		recipe.id = response.id;
+		recipe.title = response.title;
+		recipe.image = response.image;
+
+		// checkFavoriteStatus();
+		setupFavoriteButton();
+	}
+
+	private void loadUserRecipeDetails(int recipeId) {
+		recipeManager.getRecipeDetails(new UserRecipeDetailsCallback() {
 			@Override
-			public void didFetch(RecipeDetailsResponse response, String message) {
-				textView_DishDetailsTitle.setText(response.title);
-				if (response.instructions.isEmpty()) {
+			public void didFetch(Recipe userRecipe, String message) {
+				textView_DishDetailsTitle.setText(userRecipe.title);
+				if (userRecipe.instructions.isEmpty()) {
 					textViewInstructionsText.setText("No instructions available");
+				} else {
+					textViewInstructionsText.setText(cleanHTMLTags(userRecipe.instructions));
 				}
-				else {
-					textViewInstructionsText.setText(cleanHTMLTags(response.instructions));
-				}
-				Picasso.get().load(response.image).into(imageView_DishImage);
-				recyclerViewIngredientsRecView.setHasFixedSize(true);
-				recyclerViewIngredientsRecView.setLayoutManager(new LinearLayoutManager(requireContext()));
-				ingredientAdapter = new IngredientsAdapter(requireContext(), response.extendedIngredients);
-				recyclerViewIngredientsRecView.setAdapter(ingredientAdapter);
+				Picasso.get().load(userRecipe.image).into(imageView_DishImage);
+				// recyclerViewIngredientsRecView.setHasFixedSize(true);
+				// recyclerViewIngredientsRecView.setLayoutManager(new LinearLayoutManager(requireContext()));
+				// ingredientAdapter = new IngredientsAdapter(requireContext(), recipe.extendedIngredients);
+				// recyclerViewIngredientsRecView.setAdapter(ingredientAdapter);
 
 				recipe = new Recipe();
-				recipe.id = response.id;
+				recipe.id = userRecipe.id;
+				recipe.title = userRecipe.title;
+				recipe.image = userRecipe.image;
 
-				checkFavoriteStatus();
+				// checkFavoriteStatus();
+				setupFavoriteButton();
 			}
 
 			@Override
@@ -120,7 +167,6 @@ public class RecipeDetailsFragment extends Fragment {
 	}
 
 	private void checkFavoriteStatus() {
-
 		favoriteManager.isRecipeFavorite(recipe, new FavoriteManager.FavoriteCheckCallback() {
 			@Override
 			public void onSuccess(boolean isFavorite) {
@@ -139,6 +185,7 @@ public class RecipeDetailsFragment extends Fragment {
 	}
 
 	private void setupFavoriteButton() {
+		checkFavoriteStatus();
 		favoriteButton.setOnClickListener(view -> {
 			favoriteManager.toggleFavorite(recipe, new FavoriteManager.FavoriteCallback() {
 				@Override
