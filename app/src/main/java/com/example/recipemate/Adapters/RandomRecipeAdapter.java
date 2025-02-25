@@ -63,7 +63,7 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
         holder.textView_Title.setText(recipe.title);
         holder.textView_Title.setSelected(true);
         Picasso.get().load(recipeList.get(position).image)
-                .resize(600, 400)
+                .resize(600, 300)
                 .centerCrop()
                 .into(holder.imageView_RecipeImage);
 
@@ -100,7 +100,6 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
                     holder.favoriteButton.setImageResource(
                             buttonState ? R.drawable.ic_favorite_selected : R.drawable.ic_favorites
                     );
-
                 }
 
                 @Override
@@ -109,12 +108,6 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
                     Toast.makeText(context, "Error: " + error, Toast.LENGTH_SHORT).show();
                 }
             });
-//            holder.favoriteButton.setSelected(!holder.favoriteButton.isSelected());
-//            if (holder.favoriteButton.isSelected()) {
-//                holder.favoriteButton.setImageResource(R.drawable.ic_favorite_selected);
-//            } else {
-//                holder.favoriteButton.setImageResource(R.drawable.ic_favorites);
-//            }
         });
     }
 

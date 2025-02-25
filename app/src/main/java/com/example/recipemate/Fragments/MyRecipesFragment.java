@@ -1,6 +1,7 @@
 package com.example.recipemate.Fragments;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,16 +25,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.recipemate.Adapters.RandomRecipeAdapter;
+import com.example.recipemate.Adapters.UserIngredientAdapter;
+import com.example.recipemate.Listeners.IngredientActionListener;
 import com.example.recipemate.Listeners.RecipeClickListener;
 import com.example.recipemate.Listeners.UserRecipeCallback;
 import com.example.recipemate.Listeners.UserRecipesCallback;
 import com.example.recipemate.Managers.UserRecipeManager;
+import com.example.recipemate.Modals.ExtendedIngredient;
 import com.example.recipemate.Modals.Recipe;
-import com.example.recipemate.Modals.UserRecipe;
+import com.example.recipemate.Modals.UserIngredient;
 import com.example.recipemate.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyRecipesFragment extends Fragment {
@@ -51,6 +56,12 @@ public class MyRecipesFragment extends Fragment {
 	private EditText recipeTitleEditText, recipeInstructionsEditText, recipeServingsEditText, recipeCookingTimeEditText;
 	private Button submitRecipeButton;
 
+	private Button addIngredientButton;
+	private RecyclerView ingredientsRecyclerView;
+	private UserIngredientAdapter ingredientAdapter;
+	private List<UserIngredient> userIngredientList = new ArrayList<>();
+	private int editingIngredientPosition = -1;
+
 	public MyRecipesFragment() {
 		// Required empty public constructor
 	}
@@ -66,7 +77,6 @@ public class MyRecipesFragment extends Fragment {
 			}
 	);
 
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -81,6 +91,7 @@ public class MyRecipesFragment extends Fragment {
 		initManagers();
 		initViews(view);
 		setupListeners();
+		setupIngredientsRecyclerView();
 		loadUserRecipes();
 
 		return view;
@@ -104,6 +115,9 @@ public class MyRecipesFragment extends Fragment {
 		recipeCookingTimeEditText = view.findViewById(R.id.cookingTimeEditText);
 		submitRecipeButton = view.findViewById(R.id.uploadRecipeButton);
 
+		addIngredientButton = view.findViewById(R.id.addIngredientButton);
+		ingredientsRecyclerView = view.findViewById(R.id.ingredientsRecyclerView);
+
 		recipesRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 		addRecipeFormContainer.setVisibility(View.GONE);
@@ -113,6 +127,28 @@ public class MyRecipesFragment extends Fragment {
 		addRecipeButton.setOnClickListener(v -> showAddRecipeForm());
 		submitRecipeButton.setOnClickListener(v -> submitRecipe());
 		recipeImageView.setOnClickListener(v -> openImagePicker());
+		addIngredientButton.setOnClickListener(v -> showAddIngredientDialog(null, -1));
+	}
+
+	private void setupIngredientsRecyclerView() {
+		ingredientsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+		IngredientActionListener ingredientListener = new IngredientActionListener() {
+			@Override
+			public void onEditIngredient(int position, UserIngredient ingredient) {
+				showAddIngredientDialog(ingredient, position);
+			}
+
+			@Override
+			public void onIngredientSelectionChanged(int position, boolean isSelected) {
+
+			}
+		};
+
+
+		ingredientAdapter = new UserIngredientAdapter(getContext(), userIngredientList, ingredientListener);
+		ingredientsRecyclerView.setAdapter(ingredientAdapter);
+
+		updateIngredientListVisibility();
 	}
 
 	private void openImagePicker() {
@@ -122,13 +158,17 @@ public class MyRecipesFragment extends Fragment {
 
 	private void showAddRecipeForm() {
 		addRecipeFormContainer.setVisibility(View.VISIBLE);
+		addRecipeButton.setVisibility(View.GONE);
 		recipesRecyclerView.setVisibility(View.GONE);
 		emptyStateView.setVisibility(View.GONE);
 		emptyStateText.setVisibility(View.GONE);
+		userIngredientList.clear();
+		updateIngredientListVisibility();
 	}
 
 	private void hideAddRecipeForm() {
 		addRecipeFormContainer.setVisibility(View.GONE);
+		addRecipeButton.setVisibility(View.VISIBLE);
 		loadUserRecipes();
 		clearForm();
 	}
@@ -140,6 +180,8 @@ public class MyRecipesFragment extends Fragment {
 		recipeServingsEditText.setText("");
 		recipeCookingTimeEditText.setText("");
 		selectedImageUri = null;
+		userIngredientList.clear();
+		updateIngredientListVisibility();
 	}
 
 	private void showEmptyState() {
@@ -164,20 +206,23 @@ public class MyRecipesFragment extends Fragment {
 		int recipeServings = Integer.parseInt(recipeServingsEditText.getText().toString());
 		int recipeCookingTime = Integer.parseInt(recipeCookingTimeEditText.getText().toString());
 
-//		UserRecipe recipe = new UserRecipe(
-//				null,
-//				recipeTitle,
-//				recipeInstruction,
-//				null,
-//				recipeServings,
-//				recipeCookingTime
-//		);
-
 		Recipe recipe = new Recipe();
 		recipe.title = recipeTitle;
 		recipe.instructions = recipeInstruction;
 		recipe.servings = recipeServings;
 		recipe.readyInMinutes = recipeCookingTime;
+
+		ArrayList<ExtendedIngredient> extendedIngredients = new ArrayList<>();
+		for (UserIngredient userIngredient : userIngredientList) {
+			if (userIngredient.isSelected()) {
+				ExtendedIngredient ingredient = new ExtendedIngredient();
+				ingredient.name = userIngredient.getName();
+				ingredient.original = userIngredient.getOriginal();
+				extendedIngredients.add(ingredient);
+			}
+		}
+
+		recipe.extendedIngredients = extendedIngredients;
 
 		recipeManager.addRecipe(recipe, selectedImageUri, new UserRecipeCallback() {
 			@Override
@@ -233,7 +278,91 @@ public class MyRecipesFragment extends Fragment {
 			return false;
 		}
 
+		boolean hasSelectedIngredient = false;
+		for (UserIngredient ingredient : userIngredientList) {
+			if (ingredient.isSelected()) {
+				hasSelectedIngredient = true;
+				break;
+			}
+		}
+
+		if (!hasSelectedIngredient) {
+			Toast.makeText(getContext(), "Please select at least one ingredient", Toast.LENGTH_LONG).show();
+			return false;
+		}
+
 		return true;
+	}
+
+	private void showAddIngredientDialog(UserIngredient ingredientToEdit, int position) {
+		editingIngredientPosition = position;
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+		LayoutInflater inflater = requireActivity().getLayoutInflater();
+		View dialogView = inflater.inflate(R.layout.add_ingredient_dialog, null);
+
+		EditText nameEditText = dialogView.findViewById(R.id.ingredientNameEditText);
+		EditText quantityEditText = dialogView.findViewById(R.id.ingredientQuantityEditText);
+		Button cancelButton = dialogView.findViewById(R.id.cancelButton);
+		Button addButton = dialogView.findViewById(R.id.addButton);
+
+		TextView titleText = dialogView.findViewById(R.id.dialogTitle);
+
+		if (ingredientToEdit != null) {
+			titleText.setText("Edit Ingredient");
+			addButton.setText("Update");
+			nameEditText.setText(ingredientToEdit.getName());
+			quantityEditText.setText(ingredientToEdit.getOriginal());
+		} else {
+			titleText.setText("Add Ingredient");
+			addButton.setText("Add");
+		}
+
+		builder.setView(dialogView);
+		AlertDialog dialog = builder.create();
+
+		cancelButton.setOnClickListener(v -> dialog.dismiss());
+
+		addButton.setOnClickListener(v -> {
+			String name = nameEditText.getText().toString().trim();
+			String quantity = quantityEditText.getText().toString().trim();
+
+			if (name.isEmpty()) {
+				nameEditText.setError("Name is required");
+				return;
+			}
+
+			if (quantity.isEmpty()) {
+				quantityEditText.setError("Quantity is required");
+				return;
+			}
+
+			String original = quantity + " " + name;
+
+			if (position == -1) {
+				UserIngredient newIngredient = new UserIngredient(name, original);
+				userIngredientList.add(newIngredient);
+			} else {
+				UserIngredient ingredient = userIngredientList.get(position);
+				ingredient.setName(name);
+				ingredient.setOriginal(original);
+			}
+
+			ingredientAdapter.notifyDataSetChanged();
+			updateIngredientListVisibility();
+			dialog.dismiss();
+		});
+
+		dialog.show();
+	}
+
+	private void updateIngredientListVisibility() {
+		if (userIngredientList.isEmpty()) {
+			ingredientsRecyclerView.setVisibility(View.GONE);
+		} else {
+			ingredientsRecyclerView.setVisibility(View.VISIBLE);
+			ingredientAdapter.updateIngredients(userIngredientList);
+		}
 	}
 
 	private void loadUserRecipes() {

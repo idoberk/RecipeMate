@@ -6,8 +6,8 @@ import com.example.recipemate.Listeners.NextIdCallback;
 import com.example.recipemate.Listeners.UserRecipeCallback;
 import com.example.recipemate.Listeners.UserRecipeDetailsCallback;
 import com.example.recipemate.Listeners.UserRecipesCallback;
+import com.example.recipemate.Modals.ExtendedIngredient;
 import com.example.recipemate.Modals.Recipe;
-import com.example.recipemate.Modals.UserRecipe;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -15,7 +15,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
 
 public class UserRecipeManager {
 	private FirebaseAuth mAuth;
@@ -88,6 +91,10 @@ public class UserRecipeManager {
 	
 	
 	private void saveRecipe(Recipe recipe, Uri imageUri, UserRecipeCallback callback) {
+		if (recipe.extendedIngredients == null) {
+			recipe.extendedIngredients = new ArrayList<>();
+		}
+
 		db.collection(USER_RECIPES_COLLECTION)
 				.document(String.valueOf(recipe.id))
 				.set(recipe)
@@ -148,6 +155,7 @@ public class UserRecipeManager {
 					recipe.title = documentSnapshot.getString("title");
 					recipe.instructions = documentSnapshot.getString("instructions");
 					recipe.image = documentSnapshot.getString("image");
+					recipe.extendedIngredients = new ArrayList<>();
 
 					if (documentSnapshot.contains("servings")) {
 						recipe.servings = documentSnapshot.getLong("servings").intValue();
@@ -157,8 +165,35 @@ public class UserRecipeManager {
 		                recipe.cookingMinutes = documentSnapshot.getLong("readyInMinutes").intValue();
 	                }
 
-                    callback.didFetch(recipe, "Recipe found");
+					List<Map<String, Object>> ingredientsData = (List<Map<String, Object>>) documentSnapshot.get("extendedIngredients");
+					if (ingredientsData != null && !ingredientsData.isEmpty()) {
+						for (Map<String, Object> ingredientData : ingredientsData) {
+							ExtendedIngredient ingredient = new ExtendedIngredient();
 
+							if (ingredientData.containsKey("name")) {
+								ingredient.name = (String) ingredientData.get("name");
+							}
+
+							if (ingredientData.containsKey("original")) {
+								ingredient.original = (String) ingredientData.get("original");
+							}
+
+							if (ingredientData.containsKey("amount")) {
+								Object amountObj = ingredientData.get("amount");
+								if (amountObj instanceof Double) {
+									ingredient.amount = (Double) amountObj;
+								} else if (amountObj instanceof Long) {
+									ingredient.amount = ((Long) amountObj).doubleValue();
+								}
+							}
+
+							ingredient.unit = (String) ingredientData.get("unit");
+							ingredient.aisle = (String) ingredientData.get("aisle");
+							recipe.extendedIngredients.add(ingredient);
+						}
+					}
+
+                    callback.didFetch(recipe, "Recipe found");
                 } else {
                     callback.didError("Recipe not found");
                 }

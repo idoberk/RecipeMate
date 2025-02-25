@@ -31,6 +31,7 @@ public class Recipe {
 	public String sourceName;
 	public double pricePerServing;
 	public ArrayList<ExtendedIngredient> extendedIngredients;
+	public ArrayList<UserIngredient> userIngredients;
 	public String summary;
 	public ArrayList<Object> cuisines;
 	public ArrayList<String> dishTypes;

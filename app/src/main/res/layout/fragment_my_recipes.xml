@@ -14,7 +14,8 @@
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/recipesRecyclerView"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent" />
+			android:layout_height="match_parent"
+			android:visibility="gone" />
 
 		<LinearLayout
 			android:id="@+id/emptyStateView"
@@ -44,7 +45,7 @@
 			android:id="@+id/addRecipeFormContainer"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			android:visibility="gone">
+			android:visibility="visible">
 
 			<LinearLayout
 				android:layout_width="match_parent"
@@ -75,41 +76,125 @@
 				<EditText
 					android:id="@+id/recipeTitleEditText"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
+					android:layout_height="50dp"
 					android:layout_marginBottom="10dp"
+					android:background="@drawable/edit_text_field"
+					android:padding="6dp"
 					android:ems="10"
 					android:hint="Recipe Title"
 					android:inputType="text"
-					android:textSize="14sp" />
+					android:textSize="18sp" />
 
 				<EditText
 					android:id="@+id/recipeInstructionsEditText"
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
+					android:layout_height="80dp"
 					android:layout_marginBottom="10dp"
+					android:background="@drawable/edit_text_field"
+					android:gravity="start"
+					android:scrollbars="vertical"
+					android:scrollHorizontally="false"
 					android:ems="10"
 					android:hint="Recipe Instructions"
-					android:inputType="text"
+					android:padding="6dp"
 					android:textSize="14sp" />
 
-				<EditText
-					android:id="@+id/servingEditText"
+				<LinearLayout
 					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
+					android:layout_height="40dp"
 					android:layout_marginBottom="10dp"
-					android:ems="10"
-					android:hint="Serving Amount"
-					android:inputType="number"
-					android:textSize="14sp" />
+					android:padding="4dp"
+					android:orientation="horizontal">
 
-				<EditText
-					android:id="@+id/cookingTimeEditText"
+					<TextView
+						android:layout_width="80dp"
+						android:layout_height="wrap_content"
+						android:text="Serves"
+						android:textSize="16sp"
+						android:layout_gravity="start|center_vertical"
+						android:textStyle="bold"/>
+
+					<View
+						android:layout_width="0dp"
+						android:layout_height="0dp"
+						android:layout_weight="1"/>
+
+					<EditText
+						android:id="@+id/servingEditText"
+						android:layout_width="100dp"
+						android:layout_height="match_parent"
+						android:background="@drawable/edit_text_field"
+						android:paddingStart="6dp"
+						android:ems="5"
+						android:hint="2 people"
+						android:inputType="number"
+						android:textSize="14sp" />
+
+				</LinearLayout>
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="40dp"
+					android:layout_marginBottom="10dp"
+					android:padding="4dp"
+					android:orientation="horizontal">
+
+					<TextView
+						android:layout_width="160dp"
+						android:layout_height="wrap_content"
+						android:text="Cook Time"
+						android:textSize="16sp"
+						android:layout_gravity="start|center_vertical"
+						android:textStyle="bold"/>
+
+					<View
+						android:layout_width="0dp"
+						android:layout_height="0dp"
+						android:layout_weight="1"/>
+
+					<EditText
+						android:id="@+id/cookingTimeEditText"
+						android:layout_width="100dp"
+						android:layout_height="match_parent"
+						android:background="@drawable/edit_text_field"
+						android:paddingStart="6dp"
+						android:ems="5"
+						android:hint="45 minutes"
+						android:inputType="number"
+						android:textSize="14sp" />
+
+				</LinearLayout>
+
+				<TextView
 					android:layout_width="match_parent"
 					android:layout_height="wrap_content"
-					android:ems="10"
-					android:hint="Cooking Time"
-					android:inputType="number"
-					android:textSize="14sp" />
+					android:text="Ingredients:"
+					android:textSize="18sp"
+					android:textStyle="bold"
+					android:layout_marginTop="8dp"
+					android:layout_marginBottom="8dp" />
+
+				<LinearLayout
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:orientation="horizontal"
+					android:gravity="center"
+					android:layout_marginBottom="8dp">
+
+					<Button
+						android:id="@+id/addIngredientButton"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="Add Ingredient" />
+
+				</LinearLayout>
+
+				<androidx.recyclerview.widget.RecyclerView
+					android:id="@+id/ingredientsRecyclerView"
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:layout_marginBottom="16dp"
+					android:visibility="visible" />
 
 				<Button
 					android:id="@+id/uploadRecipeButton"
@@ -128,6 +213,7 @@
 			android:layout_gravity="bottom|end"
 			android:layout_margin="16dp"
 			app:fabSize="normal"
+			android:src="@drawable/ic_plus"
 			tools:src="@drawable/ic_plus" />
 
 	</FrameLayout>

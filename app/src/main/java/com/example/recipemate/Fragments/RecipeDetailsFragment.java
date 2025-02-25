@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -25,13 +26,13 @@ import com.example.recipemate.Modals.Recipe;
 import com.example.recipemate.Modals.RecipeDetailsResponse;
 import com.example.recipemate.R;
 import com.example.recipemate.api.RequestManager;
+import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 
 public class RecipeDetailsFragment extends Fragment {
 	private static final String ARG_RECIPE_ID = "recipeId";
 
-	private boolean isFavorite = false;
 	private ImageView imageView_DishImage;
     private TextView textView_DishDetailsTitle, textViewIngredients, textViewInstructionsText;
     private RecyclerView recyclerViewIngredientsRecView;
@@ -41,6 +42,7 @@ public class RecipeDetailsFragment extends Fragment {
 	private UserRecipeManager recipeManager;
 	private IngredientsAdapter ingredientAdapter;
 	private Recipe recipe;
+	private boolean isFavorite = false;
 
 	public RecipeDetailsFragment() {
 		// Required empty public constructor
@@ -57,7 +59,6 @@ public class RecipeDetailsFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 	}
 
 	@Override
@@ -66,7 +67,7 @@ public class RecipeDetailsFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_recipe_details, container, false);
 
-        initViews(view);
+		initViews(view);
 		loadRecipeDetails(getArguments().getInt(ARG_RECIPE_ID));
 
 		return view;
@@ -82,15 +83,7 @@ public class RecipeDetailsFragment extends Fragment {
 		requestManager = new RequestManager(requireContext());
 		favoriteManager = new FavoriteManager();
 		recipeManager = new UserRecipeManager();
-
-//		favoriteButton.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				toggleFavorite();
-//			}
-//		});
 	}
-
 
 	private void loadRecipeDetails(int recipeId) {
 		Log.d("RecipeDetailsFragment", "loadRecipeDetails: " + recipeId);
@@ -130,7 +123,6 @@ public class RecipeDetailsFragment extends Fragment {
 		recipe.title = response.title;
 		recipe.image = response.image;
 
-		// checkFavoriteStatus();
 		setupFavoriteButton();
 	}
 
@@ -145,17 +137,22 @@ public class RecipeDetailsFragment extends Fragment {
 					textViewInstructionsText.setText(cleanHTMLTags(userRecipe.instructions));
 				}
 				Picasso.get().load(userRecipe.image).into(imageView_DishImage);
-				// recyclerViewIngredientsRecView.setHasFixedSize(true);
-				// recyclerViewIngredientsRecView.setLayoutManager(new LinearLayoutManager(requireContext()));
-				// ingredientAdapter = new IngredientsAdapter(requireContext(), recipe.extendedIngredients);
-				// recyclerViewIngredientsRecView.setAdapter(ingredientAdapter);
+				recyclerViewIngredientsRecView.setHasFixedSize(true);
+				recyclerViewIngredientsRecView.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+				if (userRecipe.extendedIngredients != null && !userRecipe.extendedIngredients.isEmpty()) {
+					ingredientAdapter = new IngredientsAdapter(requireContext(), userRecipe.extendedIngredients);
+					recyclerViewIngredientsRecView.setAdapter(ingredientAdapter);
+				} else {
+					textViewIngredients.setText("No ingredients available");
+				}
 
 				recipe = new Recipe();
 				recipe.id = userRecipe.id;
 				recipe.title = userRecipe.title;
 				recipe.image = userRecipe.image;
+				recipe.extendedIngredients = userRecipe.extendedIngredients;
 
-				// checkFavoriteStatus();
 				setupFavoriteButton();
 			}
 
