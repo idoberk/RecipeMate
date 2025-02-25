@@ -5,7 +5,6 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +58,8 @@ public class RegisterFragment extends Fragment {
 				}
 
 				if (!isValidPassword(registeredPassword, registeredPasswordConfirm)) {
-					registerUserPassword.setError("Invalid password!");
-					registerUserPasswordConfirm.setError("Invalid password!");
+					registerUserPassword.setError("Invalid password! Must contain at least 8 characters, one letter and one number.");
+					registerUserPasswordConfirm.setError("Invalid password! Must contain at least 8 characters, one letter and one number.");
 					isValid = false;
 				}
 
@@ -103,8 +102,6 @@ public class RegisterFragment extends Fragment {
 	private void registerUser(MainActivity mainActivity) {
 		String registeredEmail = registerUserEmail.getText().toString().trim();
 		String registeredPassword = registerUserPassword.getText().toString().trim();
-
-		Log.d("RegisterFragment", "Registering user: " + registeredEmail + " " + registeredPassword);
 
 		mainActivity.register(registeredEmail, registeredPassword);
 	}

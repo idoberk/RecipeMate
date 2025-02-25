@@ -28,12 +28,4 @@ public class CategoriesRecyclerViewGrid {
 	public int getColumnCount() {
 		return 2;
 	}
-
-	public int getRowCount() {
-		return 4;
-	}
-
-	public int getTotalCategories() {
-		return categoriesList.size();
-	}
 }

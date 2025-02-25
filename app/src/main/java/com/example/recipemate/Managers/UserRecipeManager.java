@@ -2,15 +2,18 @@ package com.example.recipemate.Managers;
 
 import android.net.Uri;
 
+import com.example.recipemate.Listeners.DeleteRecipeCallback;
 import com.example.recipemate.Listeners.NextIdCallback;
 import com.example.recipemate.Listeners.UserRecipeCallback;
 import com.example.recipemate.Listeners.UserRecipeDetailsCallback;
 import com.example.recipemate.Listeners.UserRecipesCallback;
 import com.example.recipemate.Modals.ExtendedIngredient;
 import com.example.recipemate.Modals.Recipe;
+import com.example.recipemate.Modals.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -18,7 +21,6 @@ import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
 
 public class UserRecipeManager {
 	private FirebaseAuth mAuth;
@@ -87,8 +89,6 @@ public class UserRecipeManager {
 				})
 				.addOnFailureListener(e -> callback.onError("Failed to fetch recipes"));
 	}
-
-	
 	
 	private void saveRecipe(Recipe recipe, Uri imageUri, UserRecipeCallback callback) {
 		if (recipe.extendedIngredients == null) {
@@ -121,16 +121,7 @@ public class UserRecipeManager {
 				})
 				.addOnSuccessListener(uri -> {
 					recipe.image = uri.toString();
-					// recipe.sourceUrl = uri.toString();
 					updateRecipe(recipe, callback);
-					// recipe.userId = currentUser.getUid();
-
-//					db.collection(USER_RECIPES_COLLECTION)
-//							.add(recipe).addOnSuccessListener(documentReference -> {
-//								recipe.id = Integer.parseInt(documentReference.getId());
-//								callback.onSuccess(recipe);
-//							})
-//							.addOnFailureListener(e -> callback.onError("Failed to add recipe"));
 				})
 				.addOnFailureListener(e -> callback.onError("Failed to upload image"));
 	}
@@ -142,7 +133,111 @@ public class UserRecipeManager {
 				.addOnSuccessListener(aVoid -> callback.onSuccess(recipe))
 				.addOnFailureListener(e -> callback.onError("Failed to update recipe"));
 	}
-	
+
+	public void deleteRecipe(int recipeId, DeleteRecipeCallback callback) {
+		db.collection(USER_RECIPES_COLLECTION)
+				.document(String.valueOf(recipeId))
+				.get()
+				.addOnSuccessListener(documentSnapshot -> {
+					if (documentSnapshot.exists()) {
+						Recipe recipe = documentSnapshot.toObject(Recipe.class);
+
+						removeFromAllUsersFavorites(recipeId, new DeleteRecipeCallback() {
+							@Override
+							public void onSuccess() {
+								db.collection(USER_RECIPES_COLLECTION)
+										.document(String.valueOf(recipeId))
+										.delete()
+										.addOnSuccessListener(aVoid -> {
+											if (recipe != null && recipe.image != null && recipe.image.contains("firebase")) {
+												String imagePath = recipe.image.substring(recipe.image.indexOf("o/") + 2,
+														recipe.image.indexOf("?"));
+												imagePath = imagePath.replace("%2F", "/");
+
+												storage.getReference().child(imagePath).delete()
+														.addOnSuccessListener(unused -> callback.onSuccess())
+														.addOnFailureListener(e -> callback.onSuccess());
+											} else {
+												callback.onSuccess();
+											}
+										})
+										.addOnFailureListener(e -> callback.onError("Failed to delete recipe"));
+							}
+
+							@Override
+							public void onError(String error) {
+								callback.onError(error);
+							}
+						});
+					} else {
+						callback.onError("Recipe not found");
+					}
+				})
+				.addOnFailureListener(e -> callback.onError("Failed to delete recipe"));
+	}
+
+	private void removeFromAllUsersFavorites(int recipeId, DeleteRecipeCallback callback) {
+		db.collection(USERS_COLLECTION)
+				.get()
+				.addOnSuccessListener(querySnapshot -> {
+					if (querySnapshot.isEmpty()) {
+						callback.onSuccess();
+						return;
+					}
+					
+					final int[] updateCount = {0};
+					final int totalDocuments = querySnapshot.size();
+					final boolean[] hasError = {false};
+					
+					for (DocumentSnapshot userDoc : querySnapshot.getDocuments()) {
+						User user = userDoc.toObject(User.class);
+						if (user == null) {
+							updateCount[0]++;
+							continue;
+						}
+						
+						boolean hadRecipe = false;
+						if (user.getFavoriteRecipes() != null) {
+							ArrayList<Recipe> updatedFavorites = new ArrayList<>(user.getFavoriteRecipes());
+							
+							for (int i = 0; i < updatedFavorites.size(); i++) {
+								if (updatedFavorites.get(i).id == recipeId) {
+									updatedFavorites.remove(i);
+									hadRecipe = true;
+									break;
+								}
+							}
+							
+							if (hadRecipe) {
+								user.setFavoriteRecipes(updatedFavorites);
+								db.collection(USERS_COLLECTION)
+										.document(user.getUserid())
+										.set(user)
+										.addOnSuccessListener(aVoid -> {
+											updateCount[0]++;
+											if (updateCount[0] >= totalDocuments && !hasError[0]) {
+												callback.onSuccess();
+											}
+										})
+										.addOnFailureListener(e -> {
+											hasError[0] = true;
+											callback.onError("Failed to update user favorites");
+										});
+							} else {
+								updateCount[0]++;
+							}
+						} else {
+							updateCount[0]++;
+						}
+
+						if (updateCount[0] >= totalDocuments && !hasError[0]) {
+							callback.onSuccess();
+						}
+					}
+				})
+				.addOnFailureListener(e -> callback.onError("Failed to remove recipe from favorites"));
+	}
+
 	public void getRecipeDetails(UserRecipeDetailsCallback callback, int recipeId) {
 		 db.collection(USER_RECIPES_COLLECTION)
 			 .document(String.valueOf(recipeId))

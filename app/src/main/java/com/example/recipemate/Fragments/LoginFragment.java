@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.recipemate.Activities.MainActivity;
 import com.example.recipemate.R;
@@ -29,7 +28,6 @@ public class LoginFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 	}
 
 	@Override
@@ -53,8 +51,10 @@ public class LoginFragment extends Fragment {
 		loginButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				if (userEmail.getText().toString().isEmpty() || userPassword.getText().toString().isEmpty()) {
-					Toast.makeText(mainActivity, "Please fill in all the fields", Toast.LENGTH_LONG).show();
+				if (userEmail.getText().toString().isEmpty()) {
+					userEmail.setError("Email is required");
+				} else if (userPassword.getText().toString().isEmpty()) {
+					userPassword.setError("Password is required");
 				} else {
 					loginUser(mainActivity);
 				}

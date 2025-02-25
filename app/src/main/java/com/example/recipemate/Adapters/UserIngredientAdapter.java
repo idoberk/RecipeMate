@@ -41,7 +41,8 @@ public class UserIngredientAdapter extends RecyclerView.Adapter<IngredientViewHo
 
 		holder.ingredientNameText.setText(ingredient.getName());
 		holder.ingredientQuantityText.setText(ingredient.getOriginal());
-		holder.editIngredientButton.setSelected(ingredient.isSelected());
+		holder.ingredientCheckBox.setOnCheckedChangeListener(null);
+		holder.ingredientCheckBox.setChecked(ingredient.isSelected());
 
 		holder.editIngredientButton.setOnClickListener(v -> {
 			if (listener != null) {

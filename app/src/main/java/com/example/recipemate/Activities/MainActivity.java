@@ -1,7 +1,7 @@
 package com.example.recipemate.Activities;
 
 import android.os.Bundle;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Toast;
 
@@ -73,13 +73,11 @@ public class MainActivity extends AppCompatActivity {
 							FirebaseUser user = mAuth.getCurrentUser();
 							View navHostFragment = findViewById(R.id.fragmentContainerView);
 							if (user != null) {
-								Log.d("Login", "User logged in successfully: " + user.getEmail());
 								Toast.makeText(MainActivity.this, "Login successful!",
 										Toast.LENGTH_SHORT).show();
 								Navigation.findNavController(navHostFragment).navigate(R.id.action_loginFragment_to_mainFragment);
 							}
 						} else {
-							Log.e("Login", "Login failed", task.getException());
 							Toast.makeText(MainActivity.this, "Login failed",
 									Toast.LENGTH_SHORT).show();
 						}
@@ -111,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
 							} catch (Exception e) {
 								Toast.makeText(MainActivity.this, "Registration failed: " + e.getMessage(),
 										Toast.LENGTH_LONG).show();
-								Log.e("Register", "Failed to register user", e);
 							}
 						}
 					}
@@ -124,10 +121,8 @@ public class MainActivity extends AppCompatActivity {
 				document(user.getUserid())
 				.set(user)
 				.addOnSuccessListener(aVoid -> {
-					Log.d("Register", "User added to database");
 					Toast.makeText(MainActivity.this, "User added to database", Toast.LENGTH_LONG).show();
 				}).addOnFailureListener(e -> {
-					Log.e("Register", "Failed to add user to database", e);
 					Toast.makeText(MainActivity.this, "Failed to add user to database", Toast.LENGTH_LONG).show();
 				});
 	}

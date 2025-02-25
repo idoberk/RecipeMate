@@ -7,13 +7,13 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.recipemate.Activities.LoadingDialog;
 import com.example.recipemate.Adapters.RandomRecipeAdapter;
 import com.example.recipemate.Listeners.RecipeClickListener;
 import com.example.recipemate.Managers.FavoriteManager;
@@ -28,6 +28,8 @@ public class FavoritesFragment extends Fragment {
 	private RecyclerView favoritesRecyclerView;
 	private FavoriteManager favoriteManager;
 	private RandomRecipeAdapter adapter;
+	private LoadingDialog loadingDialog;
+	
 
 	public FavoritesFragment() {
 			// Required empty public constructor
@@ -44,29 +46,25 @@ public class FavoritesFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
 
+		loadingDialog = new LoadingDialog(getActivity());
+
+		loadingDialog.startAlertDialog();
 		initViews(view);
 		loadFavorites();
 		return view;
 	}
 
 	private void loadFavorites() {
-		Log.d("FavoritesFragment", "Loading favorites");
 		favoriteManager.getFavorites(new FavoriteManager.FavoritesCallback() {
 			@Override
 			public void onSuccess(List<Recipe> recipes) {
 				adapter = new RandomRecipeAdapter(requireContext(), recipes, recipeClickListener, 2);
 				favoritesRecyclerView.setAdapter(adapter);
-
-				if (recipes.isEmpty()) {
-					Log.d("FavoritesFragment", "No favorites found");
-					Toast.makeText(getContext(), "No favorites found", Toast.LENGTH_LONG).show();
-				}
+				loadingDialog.dismissDialog();
 			}
 
 			@Override
 			public void onError(String error) {
-				Log.d("FavoritesFragment", "Error loading favorites: " + error);
-				Toast.makeText(getContext(), "Error loading favorites: " + error, Toast.LENGTH_LONG).show();
 			}
 		});
 	}
@@ -88,8 +86,6 @@ public class FavoritesFragment extends Fragment {
 			Bundle bundle = new Bundle();
 			bundle.putInt("recipeId", Integer.parseInt(recipeId));
 			Navigation.findNavController(requireView()).navigate(R.id.action_favoritesFragment_to_recipeDetailsFragment, bundle);
-			Log.d("FavoritesFragment RecipeClickListener", "Recipe clicked: " + recipeId);
-			Toast.makeText(getContext(), "Recipe clicked: " + recipeId, Toast.LENGTH_LONG).show();
 		}
 	};
 }

@@ -8,13 +8,15 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,8 +26,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.recipemate.Activities.LoadingDialog;
 import com.example.recipemate.Adapters.RandomRecipeAdapter;
 import com.example.recipemate.Adapters.UserIngredientAdapter;
+import com.example.recipemate.Listeners.DeleteRecipeCallback;
 import com.example.recipemate.Listeners.IngredientActionListener;
 import com.example.recipemate.Listeners.RecipeClickListener;
 import com.example.recipemate.Listeners.UserRecipeCallback;
@@ -45,6 +49,7 @@ public class MyRecipesFragment extends Fragment {
 
 	private UserRecipeManager recipeManager;
 	private Uri selectedImageUri;
+	private LoadingDialog loadingDialog;
 
 	private RecyclerView recipesRecyclerView;
 	private FloatingActionButton addRecipeButton;
@@ -61,6 +66,7 @@ public class MyRecipesFragment extends Fragment {
 	private UserIngredientAdapter ingredientAdapter;
 	private List<UserIngredient> userIngredientList = new ArrayList<>();
 	private int editingIngredientPosition = -1;
+    private ItemTouchHelper itemTouchHelper;
 
 	public MyRecipesFragment() {
 		// Required empty public constructor
@@ -80,7 +86,6 @@ public class MyRecipesFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 	}
 
 	@Override
@@ -88,11 +93,18 @@ public class MyRecipesFragment extends Fragment {
 	                         Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_my_recipes, container, false);
+
+		loadingDialog = new LoadingDialog(getActivity());
+
+		loadingDialog.startAlertDialog();
 		initManagers();
 		initViews(view);
 		setupListeners();
 		setupIngredientsRecyclerView();
+		swipeToDelete();
 		loadUserRecipes();
+
+		loadingDialog.dismissDialog();
 
 		return view;
 	}
@@ -143,7 +155,6 @@ public class MyRecipesFragment extends Fragment {
 
 			}
 		};
-
 
 		ingredientAdapter = new UserIngredientAdapter(getContext(), userIngredientList, ingredientListener);
 		ingredientsRecyclerView.setAdapter(ingredientAdapter);
@@ -200,6 +211,8 @@ public class MyRecipesFragment extends Fragment {
 		if (!validateForm()) {
 			return;
 		}
+
+		loadingDialog.startAlertDialog();
 
 		String recipeTitle = recipeTitleEditText.getText().toString();
 		String recipeInstruction = recipeInstructionsEditText.getText().toString();
@@ -341,6 +354,7 @@ public class MyRecipesFragment extends Fragment {
 
 			if (position == -1) {
 				UserIngredient newIngredient = new UserIngredient(name, original);
+				newIngredient.setSelected(true);
 				userIngredientList.add(newIngredient);
 			} else {
 				UserIngredient ingredient = userIngredientList.get(position);
@@ -384,14 +398,60 @@ public class MyRecipesFragment extends Fragment {
 		});
 	}
 
+	private void swipeToDelete() {
+		itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT) {
+			@Override
+			public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+				return false;
+			}
+
+			@Override
+			public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+				int position = viewHolder.getAdapterPosition();
+
+				RandomRecipeAdapter adapter = (RandomRecipeAdapter) recipesRecyclerView.getAdapter();
+				if (adapter != null) {
+					Recipe recipe = adapter.getRecipeAt(position);
+
+					new AlertDialog.Builder(requireContext())
+							.setTitle("Delete Recipe")
+							.setMessage("Are you sure you want to delete this recipe?")
+							.setPositiveButton("Delete", (dialog, which) -> {
+								recipeManager.deleteRecipe(recipe.id, new DeleteRecipeCallback() {
+									@Override
+									public void onSuccess() {
+										loadUserRecipes();
+									}
+
+									@Override
+									public void onError(String error) {
+										adapter.notifyItemChanged(position);
+									}
+								});
+							})
+							.setNegativeButton("Cancel", (dialog, which) -> {
+								adapter.notifyItemChanged(position);
+							})
+							.setOnCancelListener(dialog -> {
+								adapter.notifyItemChanged(position);
+							})
+							.create()
+							.show();
+				}
+
+
+			}
+		});
+
+		itemTouchHelper.attachToRecyclerView(recipesRecyclerView);
+	}
+
 	private final RecipeClickListener recipeClickListener = new RecipeClickListener() {
 		@Override
 		public void onRecipeClick(String recipeId) {
 			Bundle bundle = new Bundle();
 			bundle.putInt("recipeId", Integer.parseInt(recipeId));
 			Navigation.findNavController(requireView()).navigate(R.id.action_myRecipesFragment_to_recipeDetailsFragment, bundle);
-			Log.d("FavoritesFragment RecipeClickListener", "Recipe clicked: " + recipeId);
-			Toast.makeText(getContext(), "Recipe clicked: " + recipeId, Toast.LENGTH_LONG).show();
 		}
 	};
 }

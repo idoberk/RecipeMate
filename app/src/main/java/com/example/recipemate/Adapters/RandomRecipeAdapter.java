@@ -1,14 +1,12 @@
 package com.example.recipemate.Adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -85,8 +83,6 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
 
             @Override
             public void onError(String error) {
-                Log.d("Favorite", "Error: " + error);
-                Toast.makeText(context, "Error: " + error, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -104,8 +100,6 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
 
                 @Override
                 public void onError(String error) {
-                    Log.d("Favorite", "Error: " + error);
-                    Toast.makeText(context, "Error: " + error, Toast.LENGTH_SHORT).show();
                 }
             });
         });
@@ -114,6 +108,13 @@ public class RandomRecipeAdapter extends RecyclerView.Adapter<RandomRecipeViewHo
     @Override
     public int getItemCount() {
         return recipeList.size();
+    }
+
+    public Recipe getRecipeAt(int position) {
+        if (position >= 0 && position < recipeList.size()) {
+            return recipeList.get(position);
+        }
+        return null;
     }
 }
 

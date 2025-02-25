@@ -1,19 +1,21 @@
 package com.example.recipemate.Fragments;
 
+
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.recipemate.Activities.LoadingDialog;
 import com.example.recipemate.Adapters.RandomRecipeAdapter;
 import com.example.recipemate.Listeners.RandomRecipeResponseListener;
 import com.example.recipemate.Listeners.RecipeClickListener;
@@ -22,6 +24,8 @@ import com.example.recipemate.R;
 import com.example.recipemate.api.RequestManager;
 
 import org.apache.commons.lang3.StringUtils;
+
+
 
 public class RecipeListFragment extends Fragment {
 
@@ -34,6 +38,7 @@ public class RecipeListFragment extends Fragment {
 	private RecyclerView recyclerView;
 	private TextView categoryTitle, resultText;
 	private String category;
+	private LoadingDialog loadingDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,9 @@ public class RecipeListFragment extends Fragment {
 	                         Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_recipe_list, container, false);
+
+		loadingDialog = new LoadingDialog(getActivity());
+
 		recyclerView = view.findViewById(R.id.RecipeListRV);
 		recyclerView.setHasFixedSize(true);
 		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -58,23 +66,23 @@ public class RecipeListFragment extends Fragment {
 
 		if (getArguments() != null) {
 			category = getArguments().getString("category", "");
-			Log.d("Category", "Received category: " + category);
 		}
 
 		requestManager = new RequestManager(requireContext());
+
+		loadingDialog.startAlertDialog();
 		fetchRecipes();
 
 		return view;
 	}
 
 	private void fetchRecipes() {
-		Log.d("Category", "Fetching recipes for category: " + category);
 		requestManager.getRandomRecipes(category, new RandomRecipeResponseListener() {
 			@Override
 			public void didFetch(RandomRecipeApiResponse response, String message) {
-				Log.d("Category", "Fetched recipes for category: " + category);
 				randomRecipeAdapter = new RandomRecipeAdapter(requireContext(), response.recipes, recipeClickListener, 2);
 				recyclerView.setAdapter(randomRecipeAdapter);
+				loadingDialog.dismissDialog();
 			}
 
 			@Override
@@ -90,8 +98,10 @@ public class RecipeListFragment extends Fragment {
 			Bundle bundle = new Bundle();
 			bundle.putInt("recipeId", Integer.parseInt(recipeId));
 			Navigation.findNavController(requireView()).navigate(R.id.action_recipeListFragment_to_recipeDetailsFragment, bundle);
-			Log.d("RecipeListFragment RecipeClickListener", "Recipe clicked: " + recipeId);
-			Toast.makeText(getContext(), "Recipe clicked: " + recipeId, Toast.LENGTH_LONG).show();
 		}
 	};
+
+
+
+
 }

@@ -7,16 +7,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.recipemate.Activities.LoadingDialog;
 import com.example.recipemate.Adapters.IngredientsAdapter;
 import com.example.recipemate.Listeners.RecipeDetailsListener;
 import com.example.recipemate.Listeners.UserRecipeDetailsCallback;
@@ -26,7 +25,6 @@ import com.example.recipemate.Modals.Recipe;
 import com.example.recipemate.Modals.RecipeDetailsResponse;
 import com.example.recipemate.R;
 import com.example.recipemate.api.RequestManager;
-import com.google.firebase.auth.FirebaseAuth;
 import com.squareup.picasso.Picasso;
 
 
@@ -43,6 +41,7 @@ public class RecipeDetailsFragment extends Fragment {
 	private IngredientsAdapter ingredientAdapter;
 	private Recipe recipe;
 	private boolean isFavorite = false;
+	private LoadingDialog loadingDialog;
 
 	public RecipeDetailsFragment() {
 		// Required empty public constructor
@@ -67,9 +66,13 @@ public class RecipeDetailsFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View view = inflater.inflate(R.layout.fragment_recipe_details, container, false);
 
+		loadingDialog = new LoadingDialog(getActivity());
+		loadingDialog.startAlertDialog();
+
 		initViews(view);
 		loadRecipeDetails(getArguments().getInt(ARG_RECIPE_ID));
 
+		loadingDialog.dismissDialog();
 		return view;
 	}
 
@@ -86,8 +89,6 @@ public class RecipeDetailsFragment extends Fragment {
 	}
 
 	private void loadRecipeDetails(int recipeId) {
-		Log.d("RecipeDetailsFragment", "loadRecipeDetails: " + recipeId);
-
 		if (recipeId < 8000000) {
 			requestManager.getRecipeDetails(new RecipeDetailsListener() {
 				@Override
@@ -103,6 +104,7 @@ public class RecipeDetailsFragment extends Fragment {
 		} else {
             loadUserRecipeDetails(recipeId);
 		}
+		
 	}
 
 	private void loadApiRecipeDetails(RecipeDetailsResponse response) {
@@ -175,8 +177,6 @@ public class RecipeDetailsFragment extends Fragment {
 
 			@Override
 			public void onError(String error) {
-				Log.d("Favorite", "Error: " + error);
-				Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
@@ -193,13 +193,10 @@ public class RecipeDetailsFragment extends Fragment {
 					favoriteButton.setImageResource(
 							buttonState ? R.drawable.ic_favorite_selected : R.drawable.ic_favorites
 					);
-
 				}
 
 				@Override
 				public void onError(String error) {
-					Log.d("Favorite", "Error: " + error);
-					Toast.makeText(requireContext(), "Error: " + error, Toast.LENGTH_SHORT).show();
 				}
 			});
 		});

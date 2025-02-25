@@ -32,7 +32,7 @@ public class RequestManager {
 
 	public void getRandomRecipes(String category, RandomRecipeResponseListener listener) {
 		CallRecipeApi callRecipeApi = retrofit.create(CallRecipeApi.class);
-		Call<RandomRecipeApiResponse> call = callRecipeApi.callRandomRecipes(context.getString(R.string.api_key), "3", category);
+		Call<RandomRecipeApiResponse> call = callRecipeApi.callRandomRecipes(context.getString(R.string.api_key), "25", category);
 		call.enqueue(new Callback<RandomRecipeApiResponse>() {
 			@Override
 			public void onResponse(Call<RandomRecipeApiResponse> call, Response<RandomRecipeApiResponse> response) {
@@ -52,7 +52,7 @@ public class RequestManager {
 
 	public void searchRecipes(String searchQuery, SearchRecipeResponseListener listener) {
 		CallRecipeApi callSearchRecipes = retrofit.create(CallRecipeApi.class);
-		Call<SearchRecipeApiResponse> call = callSearchRecipes.callSearchRecipes(context.getString(R.string.api_key), searchQuery, "3");
+		Call<SearchRecipeApiResponse> call = callSearchRecipes.callSearchRecipes(context.getString(R.string.api_key), searchQuery, "25");
 
 		call.enqueue(new Callback<SearchRecipeApiResponse>() {
 			@Override

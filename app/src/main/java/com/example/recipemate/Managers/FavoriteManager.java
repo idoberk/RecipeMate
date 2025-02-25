@@ -1,7 +1,5 @@
 package com.example.recipemate.Managers;
 
-import android.util.Log;
-
 import com.example.recipemate.Modals.Recipe;
 import com.example.recipemate.Modals.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,13 +61,11 @@ public class FavoriteManager {
 		FirebaseUser currentUser = mAuth.getCurrentUser();
 
 		if (currentUser == null) {
-			Log.e("FavoriteManager", "User not logged in");
 			callback.onError("User not logged in");
 			return;
 		}
 
 		String userId = currentUser.getUid();
-		Log.d("FavoriteManager", "Getting favorites for user: " + userId);
 		DocumentReference userRef = db.collection("users").document(userId);
 
 		userRef.get().addOnSuccessListener(document -> {
@@ -86,7 +82,6 @@ public class FavoriteManager {
 		FirebaseUser currentUser = mAuth.getCurrentUser();
 
 		if (currentUser == null) {
-			Log.e("FavoriteManager", "User not logged in");
 			callback.onError("User not logged in");
 			return;
 		}
